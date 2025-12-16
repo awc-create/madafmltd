@@ -4,9 +4,13 @@ import { Resend } from "resend";
 import { InternalContactEmail } from "@/emails/InternalContactEmail";
 import { CustomerThankYouEmail } from "@/emails/CustomerThankYouEmail";
 
-export const runtime = "nodejs"; // important on some platforms
+export const runtime = "nodejs";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null; // don't throw at import/build time
+  return new Resend(key);
+}
 
 export async function POST(req: Request) {
   try {
@@ -16,18 +20,37 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
+    const resend = getResend();
+    if (!resend) {
+      // this is a runtime config problem (env not injected on server)
+      return NextResponse.json(
+        { error: "Email service not configured" },
+        { status: 500 }
+      );
+    }
+
     const submittedAt = new Date();
 
-    const from = process.env.RESEND_FROM!;
-    const toInternal = process.env.RESEND_TO!;
+    const from = process.env.RESEND_FROM;
+    const toInternal = process.env.RESEND_TO;
+
+    if (!from || !toInternal) {
+      return NextResponse.json(
+        { error: "Missing RESEND_FROM / RESEND_TO" },
+        { status: 500 }
+      );
+    }
+
     const replyTo = process.env.RESEND_REPLY_TO || body.email;
 
-    // 1) Internal email to you
+    // Internal email
     await resend.emails.send({
       from,
       to: toInternal,
       replyTo,
-      subject: `New contact request: ${body.subject || "General"} • ${body.postcode || "-"}`,
+      subject: `New contact request: ${body.subject || "General"} • ${
+        body.postcode || "-"
+      }`,
       react: InternalContactEmail({
         name: body.name,
         email: body.email,
@@ -40,11 +63,11 @@ export async function POST(req: Request) {
       }),
     });
 
-    // 2) Thank-you email to customer
+    // Customer thank-you email
     await resend.emails.send({
       from,
       to: body.email,
-      replyTo: toInternal, // customer replies go to you
+      replyTo: toInternal,
       subject: "Thanks — we’ve received your request",
       react: CustomerThankYouEmail({
         name: body.name,
