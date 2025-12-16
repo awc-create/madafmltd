@@ -1,9 +1,4 @@
-/* Optional: keep tokens global elsewhere if you already have them */
-:root {
-  --svc-cooling: #3b82f6;     /* blue */
-  --svc-electrical: #f59e0b;  /* amber */
-  --svc-security: #ef4444;    /* red */
-}
+/* src/components/navbar/Navbar.module.scss */
 
 .navbar {
   /* Default accent */

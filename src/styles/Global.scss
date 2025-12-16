@@ -24,7 +24,7 @@ html, body {
 /* 🎨 CSS VARIABLES        */
 /* ======================= */
 :root {
-  /* Color Palette */
+  /* existing vars... */
   --color-bg: #ffffff;
   --color-text: #333333;
   --color-primary: #2C3E50;
@@ -32,11 +32,18 @@ html, body {
   --color-bg-light: #fafafa;
   --color-overlay: rgba(0,0,0,0.35);
 
-  /* Layout */
   --navbar-height: 70px;
   --max-content-width: 1200px;
   --gutter: 5%;
+
+  /* ✅ MOVE THESE HERE (service tokens) */
+  --svc-cooling: #3b82f6;
+  --svc-electrical: #f59e0b;
+  --svc-security: #ef4444;
+  --svc-success: #25d366;
 }
+
+
 
 /* Body colors */
 body {
