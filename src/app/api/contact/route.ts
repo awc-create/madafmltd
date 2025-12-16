@@ -1,5 +1,9 @@
 // src/app/api/contact/route.ts
 import { NextResponse } from "next/server";
+import { render } from "@react-email/render";
+
+import { InternalContactEmail } from "@/emails/InternalContactEmail";
+import { CustomerThankYouEmail } from "@/emails/CustomerThankYouEmail";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,12 +32,10 @@ export async function POST(req: Request) {
 
     const RESEND_API_KEY = process.env.RESEND_API_KEY?.trim();
     const RESEND_FROM = process.env.RESEND_FROM?.trim();
-    const RESEND_TO = process.env.RESEND_TO?.trim(); // your inbox
+    const RESEND_TO = process.env.RESEND_TO?.trim();
     const RESEND_REPLY_TO = process.env.RESEND_REPLY_TO?.trim();
 
-    // If you want customer confirmations later, you can add RESEND_CUSTOMER_ENABLED etc.
     if (!RESEND_API_KEY || !RESEND_FROM || !RESEND_TO) {
-      // IMPORTANT: don't throw during build; return a clear server error instead.
       console.error("Contact API misconfigured:", {
         hasKey: !!RESEND_API_KEY,
         hasFrom: !!RESEND_FROM,
@@ -45,7 +47,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Import Resend *inside* the handler so build/collect doesn't explode.
+    // Import inside handler (prevents build-time crash)
     const { Resend } = await import("resend");
     const resend = new Resend(RESEND_API_KEY);
 
@@ -55,49 +57,62 @@ export async function POST(req: Request) {
     const postcode = body.postcode?.trim() || "-";
     const phone = body.phone?.trim() || "-";
 
-    // Plain HTML (no React template dependency) — safest to get working first.
-    const html = `
-      <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial">
-        <h2>New contact request</h2>
-        <p><strong>Service:</strong> ${escapeHtml(subject)}</p>
-        <p><strong>Sub-service:</strong> ${escapeHtml(subService)}</p>
-        <p><strong>Name:</strong> ${escapeHtml(body.name)}</p>
-        <p><strong>Email:</strong> ${escapeHtml(body.email)}</p>
-        <p><strong>Phone:</strong> ${escapeHtml(phone)}</p>
-        <p><strong>Postcode:</strong> ${escapeHtml(postcode)}</p>
-        <p><strong>Submitted:</strong> ${submittedAt.toLocaleString("en-GB")}</p>
-        <hr/>
-        <pre style="white-space:pre-wrap;line-height:1.5">${escapeHtml(
-          body.message
-        )}</pre>
-      </div>
-    `;
+    // ✅ IMPORTANT: await render() if it returns Promise<string>
+    const internalHtml = await render(
+      InternalContactEmail({
+        name: body.name,
+        email: body.email,
+        phone,
+        postcode,
+        subject,
+        subService,
+        message: body.message,
+        submittedAt,
+      })
+    );
 
-    const sendRes = await resend.emails.send({
+    const customerHtml = await render(
+      CustomerThankYouEmail({
+        name: body.name,
+        subject,
+        subService,
+        postcode,
+        phone,
+      })
+    );
+
+    // 1) Send to your inbox
+    const internalRes = await resend.emails.send({
       from: RESEND_FROM,
       to: RESEND_TO,
-      replyTo: RESEND_REPLY_TO || body.email, // or always customer email
+      replyTo: RESEND_REPLY_TO || body.email,
       subject: `New ${subject} enquiry (${postcode})`,
-      html,
+      html: internalHtml,
     });
 
-    if (sendRes.error) {
-      console.error("Resend send error:", sendRes.error);
+    if (internalRes.error) {
+      console.error("Resend internal send error:", internalRes.error);
       return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
     }
 
-    return NextResponse.json({ ok: true });
+    // 2) Send confirmation to customer
+    const customerRes = await resend.emails.send({
+      from: RESEND_FROM,
+      to: body.email,
+      replyTo: RESEND_REPLY_TO || RESEND_TO,
+      subject: `We’ve received your request (${subject})`,
+      html: customerHtml,
+    });
+
+    if (customerRes.error) {
+      console.error("Resend customer send error:", customerRes.error);
+      // Don’t fail the whole request if internal email succeeded
+      return NextResponse.json({ ok: true, customerEmailSent: false });
+    }
+
+    return NextResponse.json({ ok: true, customerEmailSent: true });
   } catch (err) {
     console.error("Contact API error:", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
-}
-
-function escapeHtml(input: string) {
-  return input
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }
