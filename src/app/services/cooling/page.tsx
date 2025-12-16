@@ -1,4 +1,5 @@
 // src/app/services/cooling/page.tsx
+import React from 'react';
 
 import Head from "next/head";
 import CoolingClient from "./CoolingClient";

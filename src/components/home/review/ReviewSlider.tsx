@@ -1,19 +1,19 @@
+//  src/components/home/review/ReviewSlider.tsx
 "use client";
-
+import React from 'react';
 import dynamic from "next/dynamic";
 import { Icon } from "@iconify/react";
+import { motion, useReducedMotion } from "framer-motion";
 import styles from "./ReviewSlider.module.scss";
 
-// Dynamically import react-slick to prevent SSR issues
 const Slider = dynamic(() => import("react-slick"), { ssr: false });
 
-// Import slick-carousel styles
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const reviews = [
   {
-    name: "John Doe",
+    name: "Yusuf",
     rating: 5,
     review: "Excellent service! The team was professional and efficient.",
   },
@@ -35,14 +35,9 @@ const reviews = [
 ];
 
 const ReviewSlider: React.FC = () => {
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: false,
-  };
+  const reduce = useReducedMotion();
+
+  const settings = { dots: true, infinite: true, speed: 500, slidesToShow: 1, slidesToScroll: 1, arrows: false };
 
   const renderStars = (rating: number) =>
     Array.from({ length: 5 }, (_, i) => (
@@ -57,18 +52,41 @@ const ReviewSlider: React.FC = () => {
     ));
 
   return (
-    <section className={styles.reviewSection} aria-labelledby="reviews-heading">
-      <h2 id="reviews-heading">What Our Clients Say</h2>
+    <motion.section
+      className={styles.reviewSection}
+      aria-labelledby="reviews-heading"
+      initial={{ opacity: 0, y: reduce ? 0 : 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+    >
+      <motion.h2
+        id="reviews-heading"
+        initial={{ opacity: 0, y: reduce ? 0 : 8 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.6 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
+        What Our Clients Say
+      </motion.h2>
+
       <Slider {...settings} className={styles.slider}>
         {reviews.map((r, idx) => (
-          <div key={idx} className={styles.reviewBox}>
+          <motion.div
+            key={idx}
+            className={styles.reviewBox}
+            initial={{ opacity: 0, scale: reduce ? 1 : 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+          >
             <div className={styles.stars}>{renderStars(r.rating)}</div>
             <p className={styles.reviewText}>&quot;{r.review}&quot;</p>
             <p className={styles.reviewerName}>— {r.name}</p>
-          </div>
+          </motion.div>
         ))}
       </Slider>
-    </section>
+    </motion.section>
   );
 };
 

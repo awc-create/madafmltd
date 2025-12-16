@@ -1,21 +1,33 @@
+// src/app/contact/ContactForm.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import styles from "./Contact.module.scss";
+import { serviceOptions } from "@/lib/serviceOptions";
+import { Icon } from "@iconify/react";
+import { motion, useReducedMotion } from "framer-motion";
 
-const serviceOptions: Record<string, string[]> = {
-  Electrical: ["Wiring Installation", "Lighting Repair", "Circuit Breaker Issues"],
-  Security: ["CCTV Installation", "Alarm Systems", "Access Control"],
-  "Cooling Systems": ["AC Installation", "HVAC Maintenance", "Refrigeration Repair"],
-};
+const MotionA = motion.a;
 
-// Validation Regex
-const nameRegex = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžæÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u;
-const phoneRegex = /^((((\+44\s?([0-6]|[8-9])\d{3} | \(?0([0-6]|[8-9])\d{3}\)?)\s?\d{3}\s?(\d{2}|\d{3}))|((\+44\s?([0-6]|[8-9])\d{3}|\(?0([0-6]|[8-9])\d{3}\)?)\s?\d{3}\s?(\d{4}|\d{3}))|((\+44\s?([0-6]|[8-9])\d{1}|\(?0([0-6]|[8-9])\d{1}\)?)\s?\d{4}\s?(\d{4}|\d{3}))|((\+44\s?\d{4}|\(?0\d{4}\)?)\s?\d{3}\s?\d{3})|((\+44\s?\d{3}|\(?0\d{3}\)?)\s?\d{3}\s?\d{4})|((\+44\s?\d{2}|\(?0\d{2}\)?)\s?\d{4}\s?\d{4})))$/;
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const postcodeRegex = /([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})/;
+type ThemeKey = "cooling" | "electrical" | "security";
+
+function themeFromSubject(subject: string): ThemeKey {
+  const s = subject.toLowerCase();
+
+  if (s.includes("cooling") || s.includes("hvac") || s.includes("refriger"))
+    return "cooling";
+  if (s.includes("elect") || s.includes("wiring") || s.includes("panel"))
+    return "electrical";
+  if (s.includes("secur") || s.includes("cctv") || s.includes("alarm"))
+    return "security";
+
+  // default
+  return "cooling";
+}
 
 const ContactForm: React.FC = () => {
+  const reduce = useReducedMotion();
+
   const [subServices, setSubServices] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -26,192 +38,172 @@ const ContactForm: React.FC = () => {
     subService: "",
     message: "",
   });
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    postcode: "",
-  });
+
+  const theme = themeFromSubject(formData.subject || "");
+
+  const quickMotion = useMemo(
+    () => ({
+      whileHover: reduce ? {} : { y: -2, scale: 1.01 },
+      whileTap: reduce ? {} : { scale: 0.99 },
+      transition: { duration: 0.16, ease: [0.16, 1, 0.3, 1] as const },
+    }),
+    [reduce]
+  );
 
   const handleServiceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const service = e.target.value;
-    setSubServices(serviceOptions[service] || []);
-    setFormData({ ...formData, subject: service, subService: "" });
+    const nextSubs = serviceOptions[service] || [];
+
+    setSubServices(nextSubs);
+    setFormData((prev) => ({
+      ...prev,
+      subject: service,
+      subService: nextSubs[0] ?? "",
+    }));
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-
-    let error = "";
-    if (name === "name" && value && !nameRegex.test(value)) {
-      error = "Enter a valid full name.";
-    }
-    if (name === "email" && value && !emailRegex.test(value)) {
-      error = "Enter a valid email.";
-    }
-    if (name === "phone" && value && !phoneRegex.test(value)) {
-      error = "Enter a valid UK phone number.";
-    }
-    if (name === "postcode" && value && !postcodeRegex.test(value)) {
-      error = "Enter a valid UK postcode.";
-    }
-    setErrors({ ...errors, [name]: error });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (Object.values(errors).some((err) => err)) {
-      alert("Please correct the highlighted errors before submitting.");
-      return;
-    }
 
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    if (res.ok) {
+      alert("Your request has been sent.");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        postcode: "",
+        subject: "",
+        subService: "",
+        message: "",
       });
-      if (res.ok) {
-        alert("Your request has been sent!");
-        setFormData({
-          name: "", email: "", phone: "", postcode: "", subject: "", subService: "", message: ""
-        });
-      } else {
-        alert("Error sending message.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error sending message.");
+      setSubServices([]);
+    } else {
+      alert("Something went wrong. Please try again.");
     }
   };
 
   return (
-    <div className={styles.contactContainer}>
+    <div className={styles.contactContainer} data-theme={theme}>
       <h1>Contact Us</h1>
-      <p>
-        📞&nbsp;
-        <a href="tel:+447908833222" className={styles.contactLink}>
-          Call us: 07908 833 222
-        </a>
-        &nbsp;|&nbsp;
-        💬&nbsp;
-        <a
+
+      <div className={styles.quickActions} aria-label="Quick contact options">
+        <MotionA
+          {...quickMotion}
+          href="tel:+447908833222"
+          aria-label="Call us"
+          className={styles.quickLink}
+        >
+          <span className={`${styles.icon} ${styles.phone}`} aria-hidden="true">
+            <Icon icon="mdi:phone" width="18" height="18" />
+          </span>
+          Call
+        </MotionA>
+
+        <MotionA
+          {...quickMotion}
           href="https://wa.me/447908833222"
           target="_blank"
           rel="noopener noreferrer"
-          className={styles.contactLink}
+          aria-label="WhatsApp us"
+          className={`${styles.quickLink} ${styles.whatsAppBoost}`}
         >
-          WhatsApp us
-        </a>
-        &nbsp;|&nbsp;
-        📧&nbsp;
-        <a href="mailto:localmaintenance75@gmail.com" className={styles.contactLink}>
-          Email us
-        </a>
-      </p>
+          <span
+            className={`${styles.icon} ${styles.whatsapp}`}
+            aria-hidden="true"
+          >
+            <Icon icon="mdi:whatsapp" width="18" height="18" />
+          </span>
+          WhatsApp
+        </MotionA>
+
+        <MotionA
+          {...quickMotion}
+          href="mailto:localmaintenance75@gmail.com"
+          aria-label="Email us"
+          className={`${styles.quickLink} ${styles.emailOnlyDesktop}`}
+        >
+          <span className={`${styles.icon} ${styles.email}`} aria-hidden="true">
+            <Icon icon="mdi:email-outline" width="18" height="18" />
+          </span>
+          Email
+        </MotionA>
+      </div>
 
       <form onSubmit={handleSubmit} className={styles.contactForm}>
-        <label htmlFor="name">Full Name *</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          required
-          value={formData.name}
-          placeholder="John Doe"
-          onChange={handleInputChange}
-        />
-        {errors.name && <p className={styles.error}>{errors.name}</p>}
+        <div className={styles.field}>
+          <label htmlFor="name">Full Name *</label>
+          <input id="name" name="name" required value={formData.name} onChange={handleChange} />
+        </div>
 
-        <label htmlFor="email">Email *</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          required
-          value={formData.email}
-          placeholder="example@email.com"
-          onChange={handleInputChange}
-        />
-        {errors.email && <p className={styles.error}>{errors.email}</p>}
+        <div className={styles.field}>
+          <label htmlFor="email">Email *</label>
+          <input id="email" name="email" type="email" required value={formData.email} onChange={handleChange} />
+        </div>
 
-        <label htmlFor="phone">Phone Number (UK) *</label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          required
-          value={formData.phone}
-          placeholder="+44 7911 123456"
-          onChange={handleInputChange}
-        />
-        {errors.phone && <p className={styles.error}>{errors.phone}</p>}
+        <div className={styles.field}>
+          <label htmlFor="phone">Phone Number (UK) *</label>
+          <input id="phone" name="phone" type="tel" required value={formData.phone} onChange={handleChange} />
+        </div>
 
-        <label htmlFor="postcode">Postcode (UK) *</label>
-        <input
-          type="text"
-          id="postcode"
-          name="postcode"
-          required
-          value={formData.postcode}
-          placeholder="SW1A 1AA"
-          onChange={handleInputChange}
-        />
-        {errors.postcode && <p className={styles.error}>{errors.postcode}</p>}
+        <div className={styles.field}>
+          <label htmlFor="postcode">Postcode (UK) *</label>
+          <input id="postcode" name="postcode" required value={formData.postcode} onChange={handleChange} />
+        </div>
 
-        <label htmlFor="service">Service *</label>
-        <select
-          id="service"
-          name="subject"
-          required
-          value={formData.subject}
-          onChange={handleServiceChange}
-        >
-          <option value="" disabled>
-            Select a service
-          </option>
-          {Object.keys(serviceOptions).map((service) => (
-            <option key={service} value={service}>
-              {service}
+        <div className={`${styles.field} ${styles.full}`}>
+          <label htmlFor="subject">Service *</label>
+          <select id="subject" name="subject" required value={formData.subject} onChange={handleServiceChange}>
+            <option value="" disabled>
+              Select a service
             </option>
-          ))}
-        </select>
+            {Object.keys(serviceOptions).map((service) => (
+              <option key={service} value={service}>
+                {service}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {subServices.length > 0 && (
-          <>
+          <div className={`${styles.field} ${styles.full}`}>
             <label htmlFor="subService">Sub-Service *</label>
-            <select
-              id="subService"
-              name="subService"
-              required
-              value={formData.subService}
-              onChange={handleInputChange}
-            >
-              <option value="" disabled>
-                Select a sub-service
-              </option>
-              {subServices.map((sub, i) => (
-                <option key={i} value={sub}>
+            <select id="subService" name="subService" required value={formData.subService} onChange={handleChange}>
+              {subServices.map((sub) => (
+                <option key={sub} value={sub}>
                   {sub}
                 </option>
               ))}
             </select>
-          </>
+          </div>
         )}
 
-        <label htmlFor="message">Message *</label>
-        <textarea
-          id="message"
-          name="message"
-          rows={5}
-          required
-          value={formData.message}
-          placeholder="Write your message here..."
-          onChange={handleInputChange}
-        />
+        <div className={`${styles.field} ${styles.full}`}>
+          <label htmlFor="message">Message *</label>
+          <textarea
+            id="message"
+            name="message"
+            rows={5}
+            required
+            value={formData.message}
+            onChange={handleChange}
+            placeholder="Briefly describe the issue or installation required…"
+          />
+        </div>
 
         <button type="submit" className={styles.submitButton}>
           Send Request

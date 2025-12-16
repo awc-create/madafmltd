@@ -1,3 +1,6 @@
+// src/app/contact/page.tsx
+import React from 'react';
+
 import Head from "next/head";
 import ContactForm from "./ContactForm";
 

@@ -1,19 +1,23 @@
 import Hero from "@/components/home/hero/Hero";
 import Services from "@/components/home/services/Services";
+import ServiceLinks from "@/components/home/serviceLinks/ServiceLinks";
 import ReviewSlider from "@/components/home/review/ReviewSlider";
 import styles from "./page.module.scss";
 
 const Home: React.FC = () => {
   return (
-    <main className={styles.homeContainer}>
+    <main className={styles.homeContainer}
+    >
       <Hero />
       <Services />
+      <ServiceLinks />
       <ReviewSlider />
     </main>
   );
 };
 
 export default Home;
+
 
 // import React from "react";
 // import Image from "next/image";

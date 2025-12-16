@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type { Metadata } from "next";
 import "@/styles/Global.scss";
 import Navbar from "@/components/navbar/Navbar";

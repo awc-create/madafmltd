@@ -1,0 +1,36 @@
+.hero {
+  padding: clamp(64px, 8vw, 110px) 0 clamp(26px, 5vw, 54px);
+  background: #faf7f3;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.inner {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted, #6b7280);
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: #2c3e50;
+  margin: 0 0 0.55rem;
+}
+
+.lead {
+  max-width: 70ch;
+  margin: 0 auto;
+  font-size: clamp(1rem, 1.3vw, 1.1rem);
+  line-height: 1.7;
+  color: rgba(44, 62, 80, 0.78);
+}
