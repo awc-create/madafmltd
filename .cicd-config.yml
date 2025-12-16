@@ -1,4 +1,4 @@
-project_type: node
+project_type: static
 slug: madafmltd
 port: 3000
 
