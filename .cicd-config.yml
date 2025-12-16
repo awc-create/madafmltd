@@ -1,9 +1,9 @@
 project_type: node
-slug: madaaircon
+slug: madafmltd
 port: 3000
 
 domains:
-  prod: madaaircon.com   # change to your real domain
+  prod: madafmltd.co.uk   # change to your real domain
 
 deploy_targets:
   main-hetz: hetzner
