@@ -1,3 +1,6 @@
+// src/app/services/cooling/CoolingClient.tsx (FULL)
+// Only change: wrap Button components with <span className={styles.primaryWrap}>…</span>
+
 "use client";
 
 import React, { useId, useMemo, useState } from "react";
@@ -71,12 +74,7 @@ export default function CoolingClient() {
     <main className={styles.page}>
       {/* HERO */}
       <header className={styles.hero} aria-labelledby="cooling-title">
-        <motion.div
-          className={styles.heroInner}
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-        >
+        <motion.div className={styles.heroInner} variants={fadeUp} initial="hidden" animate="show">
           <p className={styles.eyebrow}>Cooling Systems</p>
 
           <h1 id="cooling-title" className={styles.title}>
@@ -84,17 +82,20 @@ export default function CoolingClient() {
           </h1>
 
           <p className={styles.lead}>
-            Installation, maintenance and rapid breakdown support — covering refrigeration, air
-            conditioning, AHUs and air source heat pumps. Fully compliant, F-Gas &amp; MCS certified.
+            Installation, maintenance and rapid breakdown support — covering refrigeration, air conditioning, AHUs and
+            air source heat pumps. Fully compliant, F-Gas &amp; MCS certified.
           </p>
 
           <div className={styles.heroCtas}>
-            <Button
-              text="Request a Quote"
-              href="/contact"
-              variant="primary"
-              aria-label="Request a quote for cooling systems"
-            />
+            <span className={styles.primaryWrap}>
+              <Button
+                text="Request a Quote"
+                href="/contact"
+                variant="primary"
+                aria-label="Request a quote for cooling systems"
+              />
+            </span>
+
             <a className={styles.secondaryLink} href="/services">
               View all services
             </a>
@@ -109,7 +110,7 @@ export default function CoolingClient() {
         </motion.div>
       </header>
 
-      {/* COMMERCIAL FOCUS (NEW) */}
+      {/* COMMERCIAL FOCUS */}
       <section className={styles.section} aria-labelledby="commercial-focus">
         <div className={styles.sectionInner}>
           <motion.h2
@@ -136,8 +137,8 @@ export default function CoolingClient() {
                 <p className={styles.kicker}>Since 2004</p>
                 <h3 className={styles.commercialTitle}>Commercial Fridge Repair London</h3>
                 <p className={styles.commercialLead}>
-                  When a commercial fridge fails, stock and service feel the pressure.
-                  We respond fast with qualified F-Gas engineers to keep trade moving.
+                  When a commercial fridge fails, stock and service feel the pressure. We respond fast with qualified
+                  F-Gas engineers to keep trade moving.
                 </p>
 
                 <ul className={styles.bullets}>
@@ -147,7 +148,9 @@ export default function CoolingClient() {
                 </ul>
 
                 <div className={styles.inlineCta}>
-                  <Button text="Book a Callout" href="/contact" variant="primary" />
+                  <span className={styles.primaryWrap}>
+                    <Button text="Book a Callout" href="/contact" variant="primary" />
+                  </span>
                   <span className={styles.note}>Commercial sites • shops • cafés • restaurants</span>
                 </div>
               </div>
@@ -170,8 +173,8 @@ export default function CoolingClient() {
                 <p className={styles.kicker}>Commercial AC</p>
                 <h3 className={styles.commercialTitle}>Commercial Air Conditioning</h3>
                 <p className={styles.commercialLead}>
-                  Design, install and maintain reliable cooling for offices, retail, restaurants
-                  and industrial spaces — with efficiency and compliance built in.
+                  Design, install and maintain reliable cooling for offices, retail, restaurants and industrial spaces —
+                  with efficiency and compliance built in.
                 </p>
 
                 <ul className={styles.bullets}>
@@ -181,7 +184,9 @@ export default function CoolingClient() {
                 </ul>
 
                 <div className={styles.inlineCta}>
-                  <Button text="Request a Quote" href="/contact" variant="primary" />
+                  <span className={styles.primaryWrap}>
+                    <Button text="Request a Quote" href="/contact" variant="primary" />
+                  </span>
                   <span className={styles.note}>Install • maintain • repair</span>
                 </div>
               </div>
@@ -250,12 +255,7 @@ export default function CoolingClient() {
             </p>
 
             <div className={styles.certGrid}>
-              <a
-                className={styles.certItem}
-                href="https://www.fgasregister.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a className={styles.certItem} href="https://www.fgasregister.com/" target="_blank" rel="noopener noreferrer">
                 <Image
                   src="/images/fgas-certification-logo.png"
                   alt="F-Gas Certification"
@@ -265,12 +265,7 @@ export default function CoolingClient() {
                 />
               </a>
 
-              <a
-                className={styles.certItem}
-                href="https://www.cityandguilds.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a className={styles.certItem} href="https://www.cityandguilds.com/" target="_blank" rel="noopener noreferrer">
                 <Image
                   src="/images/city-and-guilds-certification-logo.png"
                   alt="City & Guilds Certification"
@@ -280,12 +275,7 @@ export default function CoolingClient() {
                 />
               </a>
 
-              <a
-                className={styles.certItem}
-                href="https://mcscertified.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a className={styles.certItem} href="https://mcscertified.com/" target="_blank" rel="noopener noreferrer">
                 <Image
                   src="/images/mcs-certification-logo.png"
                   alt="MCS Certification"
@@ -317,6 +307,7 @@ export default function CoolingClient() {
             {FAQS.map((item, idx) => {
               const open = openFaq === idx;
               const panelId = `${uid}-faq-${idx}`;
+
               return (
                 <motion.div
                   key={item.q}
@@ -374,7 +365,9 @@ export default function CoolingClient() {
             <p className={styles.bottomText}>
               Tell us what system you have and what’s happening — we’ll advise on next steps and arrange a visit.
             </p>
-            <Button text="Contact Us" href="/contact" variant="primary" />
+            <span className={styles.primaryWrap}>
+              <Button text="Contact Us" href="/contact" variant="primary" />
+            </span>
           </motion.div>
         </div>
       </section>

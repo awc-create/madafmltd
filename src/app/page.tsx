@@ -1,7 +1,9 @@
+// src/app/page.tsx
 import Hero from "@/components/home/hero/Hero";
 import Services from "@/components/home/services/Services";
 import ServiceLinks from "@/components/home/serviceLinks/ServiceLinks";
 import ReviewSlider from "@/components/home/review/ReviewSlider";
+import CalloutPricing from "@/components/home/calloutPricing/CalloutPricing";
 import styles from "./page.module.scss";
 
 const Home: React.FC = () => {
@@ -11,6 +13,7 @@ const Home: React.FC = () => {
       <Hero />
       <Services />
       <ServiceLinks />
+      <CalloutPricing />
       <ReviewSlider />
     </main>
   );

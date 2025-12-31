@@ -1,3 +1,6 @@
+// src/app/services/security/SecurityClient.tsx (FULL)
+// Changes: wrap Buttons with <span className={styles.primaryWrap}>…</span> so this page controls the accent (security red).
+
 "use client";
 
 import React, { useId, useMemo, useState } from "react";
@@ -87,12 +90,7 @@ export default function SecurityClient() {
     <main className={styles.page}>
       {/* HERO */}
       <header className={styles.hero} aria-labelledby="security-title">
-        <motion.div
-          className={styles.heroInner}
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-        >
+        <motion.div className={styles.heroInner} variants={fadeUp} initial="hidden" animate="show">
           <p className={styles.eyebrow}>Security</p>
 
           <h1 id="security-title" className={styles.title}>
@@ -100,13 +98,15 @@ export default function SecurityClient() {
           </h1>
 
           <p className={styles.lead}>
-            Expert fitting and configuration of CCTV, intercoms, alarms and smart
-            locks. We install cleanly, wire properly, and commission systems for
-            reliable day-to-day use.
+            Expert fitting and configuration of CCTV, intercoms, alarms and smart locks. We install cleanly, wire
+            properly, and commission systems for reliable day-to-day use.
           </p>
 
           <div className={styles.heroCtas}>
-            <Button text="Request a Quote" href="/contact" variant="primary" />
+            <span className={styles.primaryWrap}>
+              <Button text="Request a Quote" href="/contact" variant="primary" />
+            </span>
+
             <a className={styles.secondaryLink} href="/services">
               View all services
             </a>
@@ -183,7 +183,7 @@ export default function SecurityClient() {
               return (
                 <motion.div
                   key={item.q}
-                  className={styles.faqItem}
+                  className={`${styles.faqItem} ${open ? styles.open : ""}`}
                   initial={{ opacity: 0, y: reduce ? 0 : 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.25 }}
@@ -237,7 +237,9 @@ export default function SecurityClient() {
             <p className={styles.bottomText}>
               Tell us what you have (or what you’re considering) and we’ll recommend the cleanest install approach.
             </p>
-            <Button text="Contact Us" href="/contact" variant="primary" />
+            <span className={styles.primaryWrap}>
+              <Button text="Contact Us" href="/contact" variant="primary" />
+            </span>
           </motion.div>
         </div>
       </section>

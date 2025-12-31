@@ -1,0 +1,249 @@
+.wrap {
+  width: 100%;
+  padding: 3.25rem 1rem;
+}
+
+.inner {
+  max-width: 1360px; /* wider */
+  margin: 0 auto;
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+  line-height: 1.15;
+  margin: 0 0 0.6rem;
+  color: #0b1b2b;
+}
+
+.sub {
+  max-width: 940px;
+  margin: 0.35rem auto 1.75rem;
+  line-height: 1.65;
+  color: rgba(20, 40, 70, 0.78);
+}
+
+/* Wider, bigger cards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+}
+
+.card {
+  --accent: var(--svc-cooling);
+
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(26, 60, 86, 0.14);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+
+  /* bigger look */
+  box-shadow:
+    0 20px 70px rgba(0, 0, 0, 0.10),
+    0 18px 60px color-mix(in srgb, var(--accent) 12%, transparent);
+
+  /* key: same overall height for all */
+  min-height: 610px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.card[data-theme="cooling"] { --accent: var(--svc-cooling); }
+.card[data-theme="electrical"] { --accent: var(--svc-electrical); }
+.card[data-theme="security"] { --accent: var(--svc-security); }
+
+/* ===== Header (fixed structure) ===== */
+.header {
+  padding: 22px 22px 18px;
+  /* keep header height consistent so the first divider aligns perfectly */
+  height: 170px;
+}
+
+.headTop {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  align-items: center;
+  justify-content: center;
+
+  background: color-mix(in srgb, var(--accent) 10%, white);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, rgba(26, 60, 86, 0.12));
+  color: color-mix(in srgb, var(--accent) 70%, #0b1b2b);
+}
+
+.h3 {
+  text-align: left;
+  font-weight: 900;
+  color: #0b1b2b;
+  letter-spacing: -0.01em;
+  font-size: 1.12rem;
+  line-height: 1.2;
+}
+
+.badge {
+  white-space: nowrap; /* keep F-Gas on one line */
+  font-size: 0.82rem;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--accent) 55%, #0b1b2b);
+  background: color-mix(in srgb, var(--accent) 10%, white);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, rgba(26, 60, 86, 0.12));
+  min-width: 82px;
+  text-align: center;
+}
+
+.desc {
+  margin: 12px 0 0;
+  text-align: left;
+  color: rgba(15, 35, 60, 0.76);
+  line-height: 1.55;
+  font-size: 1.02rem;
+
+  /* clamp so header stays same height */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+}
+
+/* main divider */
+.hr {
+  height: 1.5px;
+  margin: 0 22px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent) 85%, white),
+    color-mix(in srgb, var(--accent) 35%, transparent)
+  );
+  opacity: 0.7;
+}
+
+/* ===== Uniform rows ===== */
+.row {
+  padding: 18px 22px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 16px;
+
+  /* fixed band height -> everything aligns */
+  min-height: 104px;
+}
+
+.rowLabel {
+  text-align: left;
+  color: rgba(15, 35, 60, 0.78);
+  line-height: 1.35;
+  font-size: 1.02rem;
+}
+
+.rowValueWrap {
+  text-align: right;
+}
+
+.rowValue {
+  display: block;
+  font-weight: 900;
+  color: #0b1b2b;
+  white-space: nowrap;
+  font-size: 1.05rem;
+}
+
+.note {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: rgba(15, 35, 60, 0.60);
+  line-height: 1.25;
+}
+
+.empty {
+  color: rgba(15, 35, 60, 0.35);
+  font-weight: 800;
+}
+
+/* dotted separators between rows */
+.sep {
+  margin: 0 22px;
+  border-top: 1px dashed rgba(10, 20, 30, 0.12);
+}
+
+/* final row sits at the bottom evenly */
+.finalRow {
+  margin-top: auto; /* pushes final row to bottom so the card balances */
+  min-height: 104px;
+}
+
+/* Buttons */
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-weight: 900;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #1a3c56, #0b1b2b);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.14);
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-weight: 900;
+  text-decoration: none;
+  color: #0b1b2b;
+  border: 1px solid rgba(15, 35, 60, 0.22);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+/* Mobile stack */
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    min-height: unset;
+  }
+  .header {
+    height: auto;
+  }
+  .row {
+    min-height: 92px;
+  }
+  .finalRow {
+    margin-top: 0;
+  }
+}

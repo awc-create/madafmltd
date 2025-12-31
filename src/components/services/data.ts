@@ -1,3 +1,4 @@
+// src/components/services/data.ts
 export type ServiceItem = {
   id: 'electrical' | 'cooling' | 'security';
   title: string;
