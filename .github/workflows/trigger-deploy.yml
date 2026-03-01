@@ -31,13 +31,21 @@ jobs:
           echo "Target CICD: ${{ env.TARGET_REPO }}"
 
       - name: Send Deployment Trigger
+        env:
+          DISPATCH_SHARED_KEY: ${{ secrets.DISPATCH_SHARED_KEY }}
         run: |
           curl -sS -X POST \
             -H "Authorization: token ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
             -H "Accept: application/vnd.github+json" \
-            --data '{"event_type":"deploy","client_payload":{
-              "repository":"${{ github.repository }}",
-              "repository_name":"${{ github.event.repository.name }}",
-              "branch":"'"${{ env.SEND_BRANCH }}"'"
-            }}' \
-            https://api.github.com/repos/${{ env.TARGET_REPO }}/dispatches
+            -d @- \
+            https://api.github.com/repos/${{ env.TARGET_REPO }}/dispatches <<JSON
+          {
+            "event_type": "deploy",
+            "client_payload": {
+              "deploy_key": "${DISPATCH_SHARED_KEY}",
+              "repository": "${{ github.repository }}",
+              "repository_name": "${{ github.event.repository.name }}",
+              "branch": "${{ env.SEND_BRANCH }}"
+            }
+          }
+          JSON
